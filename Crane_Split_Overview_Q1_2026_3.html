@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crane Split Overview - Q1/2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0B0F1A;--s:#131829;--s2:#1A2035;--s3:#0F1322;--bd:#252D44;
+  --t:#E8ECF4;--td:#8892A8;--tm:#5A6580;
+  --blue:#3B82F6;--blue-g:rgba(59,130,246,0.13);
+  --orange:#F59E0B;--orange-g:rgba(245,158,11,0.12);
+  --red:#EF4444;--red-g:rgba(239,68,68,0.10);
+  --green:#10B981;--green-g:rgba(16,185,129,0.10);
+  --cyan:#06B6D4;--purple:#8B5CF6;--teal:#14B8A6;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);-webkit-font-smoothing:antialiased}
+.page{max-width:1480px;margin:0 auto;padding:22px 28px 18px}
+
+/* HEADER */
+.header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--bd)}
+.header h1{font-size:20px;font-weight:700;letter-spacing:-0.4px}
+.header h1 span{color:var(--blue)}
+.header .sub{font-size:11px;color:var(--td);margin-top:3px}
+.header-badge{font-size:10px;color:var(--tm);background:var(--s);padding:5px 12px;border-radius:5px;border:1px solid var(--bd);white-space:nowrap;display:flex;align-items:center;gap:5px}
+.header-badge .dot{width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 5px var(--green)}
+
+/* DECISION PANEL */
+.decision-panel{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px}
+.decision{background:linear-gradient(135deg,rgba(59,130,246,0.06),rgba(59,130,246,0.02));border:1px solid rgba(59,130,246,0.2);border-radius:10px;padding:13px 15px;position:relative}
+.decision::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:10px 10px 0 0}
+.decision:nth-child(1)::before{background:var(--blue)}
+.decision:nth-child(2)::before{background:var(--orange)}
+.decision:nth-child(3)::before{background:var(--green)}
+.decision .d-num{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--blue);margin-bottom:4px}
+.decision:nth-child(2) .d-num{color:var(--orange)}
+.decision:nth-child(3) .d-num{color:var(--green)}
+.decision .d-title{font-size:12.5px;font-weight:700;color:var(--t);margin-bottom:4px;line-height:1.35}
+.decision .d-body{font-size:10px;color:var(--td);line-height:1.5}
+.decision .d-metric{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--t);background:rgba(255,255,255,0.05);display:inline-block;padding:2px 7px;border-radius:4px;margin-top:5px}
+
+/* KPI STRIP */
+.kpi-strip{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-bottom:14px}
+.kpi{background:var(--s);border:1px solid var(--bd);border-radius:8px;padding:11px 13px;position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--blue);opacity:.4}
+.kpi.w::before{background:var(--orange)}.kpi.a::before{background:var(--red)}.kpi.g::before{background:var(--green)}
+.kpi-l{font-size:9px;font-weight:600;color:var(--tm);text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px}
+.kpi-v{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:600}
+.kpi-v .u{font-size:11px;color:var(--td);font-weight:400;margin-left:1px}
+.kpi-s{font-size:9px;color:var(--td);margin-top:2px}
+
+/* GRID */
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.card{background:var(--s);border:1px solid var(--bd);border-radius:9px;padding:14px 16px}
+.card-t{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--td);margin-bottom:3px}
+.card-i{font-size:10px;color:var(--tm);line-height:1.4;margin-bottom:8px;padding-left:7px;border-left:2px solid var(--blue)}
+.card-i.w{border-left-color:var(--orange)}.card-i.a{border-left-color:var(--red)}.card-i.g{border-left-color:var(--green)}
+.span-2{grid-column:span 2}
+
+/* ACTIONS BAR */
+.actions-bar{margin-top:14px;background:var(--s2);border:1px solid var(--bd);border-radius:9px;padding:14px 18px;display:grid;grid-template-columns:auto 1fr 1fr 1fr 1fr 1fr;gap:14px;align-items:start}
+.actions-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--blue);writing-mode:vertical-lr;transform:rotate(180deg);text-align:center;align-self:center}
+.action-item{font-size:10px;color:var(--td);line-height:1.5}
+.action-item .a-num{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:var(--blue);background:var(--blue-g);width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;border-radius:4px;margin-right:5px;margin-bottom:3px}
+.action-item strong{color:var(--t);font-weight:600;display:block;font-size:10.5px;margin-bottom:2px}
+
+/* BENCHMARK TABLE */
+.bench-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:6px}
+.bench-table th{text-align:left;font-size:9px;font-weight:600;color:var(--tm);text-transform:uppercase;letter-spacing:.5px;padding:5px 8px;border-bottom:1px solid var(--bd)}
+.bench-table td{padding:7px 8px;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--t);border-bottom:1px solid rgba(37,45,68,.4)}
+.bench-table tr:last-child td{border-bottom:none}
+.bench-table .lbl{font-family:'DM Sans',sans-serif;font-weight:600;font-size:10.5px}
+.badge{display:inline-block;font-size:8.5px;font-weight:700;padding:2px 6px;border-radius:3px;letter-spacing:.2px}
+.b-green{background:var(--green-g);color:var(--green)}
+.b-orange{background:var(--orange-g);color:var(--orange)}
+.b-red{background:var(--red-g);color:var(--red)}
+.b-blue{background:var(--blue-g);color:var(--blue)}
+
+@media print{body{background:#fff;color:#1a1a1a}.kpi,.card{border-color:#ddd;background:#f9f9f9}}
+</style>
+</head>
+<body>
+<div class="page">
+  <!-- HEADER -->
+  <div class="header">
+    <div>
+      <h1>Crane Split Overview — <span>Q1/2026</span></h1>
+      <div class="sub">Crane deployment, workload balance & Net BMPH performance analysis &nbsp;|&nbsp; HTIT Operations &nbsp;|&nbsp; All metrics use Net BMPH only</div>
+    </div>
+    <div class="header-badge"><div class="dot"></div>44 MSC + 11 COSCO calls &nbsp;·&nbsp; Jan–Mar 2026</div>
+  </div>
+
+  <!-- EXECUTIVE DECISIONS -->
+  <div class="decision-panel">
+    <div class="decision">
+      <div class="d-num">Decision 1</div>
+      <div class="d-title">Adopt COSCO as the internal Net BMPH and workload balance benchmark</div>
+      <div class="d-body">Same terminal, same 4-crane mode, same equipment. COSCO achieves Net BMPH 119 vs MSC 93 — a 26-point gap driven entirely by better crane balance (CV 10% vs 45%). COSCO is proof that the infrastructure supports BMPH 100+. Use as the reference in monthly planning reviews.</div>
+      <div class="d-metric">COSCO Net BMPH 119 | MSC 93 | Gap: −26</div>
+    </div>
+    <div class="decision">
+      <div class="d-num">Decision 2</div>
+      <div class="d-title">Set KPI: maintain CV ≤ 40% for at least 80% of total working time during execution</div>
+      <div class="d-body">Pre-planning crane moves is not feasible — stowage plans for import/export cargo dictate initial crane work. The focus must be on execution. When imbalance is detected during operations — crane idle time, crane breakdown, or crane speed differences — trigger resequencing or workload rearrangement to restore CV ≤ 40%.</div>
+      <div class="d-metric">Trigger: idle / breakdown / speed gap → Resequence</div>
+    </div>
+    <div class="decision">
+      <div class="d-num">Decision 3</div>
+      <div class="d-title">Coordinate with shipping lines to optimize vessel rotation and reduce effective CI where possible</div>
+      <div class="d-body">Avg MSC CI is 4.7 vs COSCO 5.4, yet both operate at 4 cranes. When CI significantly exceeds the terminal's practical crane capacity (e.g. CI 6+ receiving 4 cranes), the gap cannot be closed by execution alone. Engage shipping lines to explore service rotation adjustments, berth window optimization, or vessel swaps that better align CI with available crane resources.</div>
+      <div class="d-metric">11 MSC vessels with CI ≥ 5 capped at 4 cranes</div>
+    </div>
+  </div>
+
+  <!-- KPI STRIP -->
+  <div class="kpi-strip">
+    <div class="kpi">
+      <div class="kpi-l">MSC Calls</div>
+      <div class="kpi-v">44</div>
+      <div class="kpi-s">Q1 2026</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-l">Avg CI</div>
+      <div class="kpi-v">4.7</div>
+      <div class="kpi-s">LOA ÷ 60</div>
+    </div>
+    <div class="kpi g">
+      <div class="kpi-l">Avg Cranes</div>
+      <div class="kpi-v">3.9</div>
+      <div class="kpi-s">CI Util: 83%</div>
+    </div>
+    <div class="kpi w">
+      <div class="kpi-l">Avg Net BMPH</div>
+      <div class="kpi-v">93.4</div>
+      <div class="kpi-s">Target: 100</div>
+    </div>
+    <div class="kpi a">
+      <div class="kpi-l">Simultaneous</div>
+      <div class="kpi-v">45<span class="u">%</span></div>
+      <div class="kpi-s">20 of 44 calls</div>
+    </div>
+    <div class="kpi a">
+      <div class="kpi-l">Avg Imbalance</div>
+      <div class="kpi-v">44.8<span class="u">%</span></div>
+      <div class="kpi-s">COSCO: 10%</div>
+    </div>
+    <div class="kpi g">
+      <div class="kpi-l">≥ 100 Net BMPH</div>
+      <div class="kpi-v">14<span class="u">/44</span></div>
+      <div class="kpi-s">32% of calls</div>
+    </div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="grid">
+    <!-- 1. CI vs Actual Cranes -->
+    <div class="card">
+      <div class="card-t">① CI vs Actual Cranes — CV & Simultaneity Overlay</div>
+      <div class="card-i">Color = CV intensity (green = low, red = high). Triangles = simultaneous ops. Most points below the diagonal confirm a structural 4-crane ceiling. High-CV vessels (dark red) cluster among CI ≥ 5 cases — showing that when large vessels are under-craned, poor balance amplifies the performance penalty.</div>
+      <div><canvas id="chartCI" height="190"></canvas></div>
+    </div>
+
+    <!-- 2. Crane Distribution -->
+    <div class="card">
+      <div class="card-t">② Crane Split Distribution — MSC vs COSCO</div>
+      <div class="card-i">Both operators center on 4 cranes (MSC 61%, COSCO 82%). COSCO's 4-crane avg Net BMPH is 124 vs MSC's 95 — a 29-point gap at the same crane count. The difference is not how many cranes are deployed, but how well they are balanced during execution.</div>
+      <div><canvas id="chartDist" height="190"></canvas></div>
+    </div>
+
+    <!-- 3. Simultaneity vs Net BMPH (NEW - replaces table) -->
+    <div class="card">
+      <div class="card-t">③ Simultaneity Hours vs Net BMPH</div>
+      <div class="card-i w">Net BMPH spread widens dramatically with simultaneity. At 0 hours, range is 52–131. At 10+ hours, values cluster 55–100 with few above target. The risk is not average decline — it's compressed upside and wider downside.</div>
+      <div><canvas id="chartSimul" height="190"></canvas></div>
+    </div>
+
+    <!-- 4. Imbalance Bar -->
+    <div class="card span-2">
+      <div class="card-t">④ Crane Workload Imbalance — Top 15 Worst Cases (MSC)</div>
+      <div class="card-i a">Top-10 avg CV 79%. MSC ALTAIR at 113% = one crane handled 2.8× the lightest. Execution triggers for rebalancing: crane idle > 10 min, crane breakdown, or any crane falling > 30% behind the average pace. Real-time monitoring is key.</div>
+      <div><canvas id="chartImb" height="155"></canvas></div>
+    </div>
+
+    <!-- 5. COSCO Benchmark -->
+    <div class="card">
+      <div class="card-t">⑤ MSC vs COSCO Benchmark</div>
+      <div class="card-i g">Same terminal, same 4-crane mode, same equipment. COSCO achieves Net BMPH 119 vs MSC 93 — a 26-point gap. The differentiator: COSCO avg imbalance CV 10% vs MSC 45%. This is what good looks like.</div>
+      <table class="bench-table">
+        <thead><tr><th>Metric</th><th>MSC (44)</th><th>COSCO (11)</th><th>Gap</th></tr></thead>
+        <tbody>
+          <tr><td class="lbl">Avg Net BMPH</td><td>93.4</td><td>119.1</td><td><span class="badge b-red">−25.7</span></td></tr>
+          <tr><td class="lbl">Avg Cranes</td><td>3.9</td><td>4.0</td><td><span class="badge b-blue">≈ same</span></td></tr>
+          <tr><td class="lbl">CI Utilization</td><td>83%</td><td>75%</td><td><span class="badge b-orange">MSC higher</span></td></tr>
+          <tr><td class="lbl">Avg Imbalance CV</td><td>44.8%</td><td>10.0%</td><td><span class="badge b-red">−34.8pp</span></td></tr>
+          <tr><td class="lbl">Simul. Frequency</td><td>45%</td><td>18%</td><td><span class="badge b-orange">−27pp</span></td></tr>
+          <tr><td class="lbl">Calls ≥ 100</td><td>32%</td><td>91%</td><td><span class="badge b-red">−59pp</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 6. 3-Way Bubble: Net BMPH × Imbalance × Cranes (MSC + COSCO) -->
+    <div class="card span-2">
+      <div class="card-t">⑥ Net BMPH × Imbalance × Cranes — MSC vs COSCO</div>
+      <div class="card-i">COSCO (teal) clusters in the top-left: low imbalance, high Net BMPH. MSC spreads across the full range. At the same 4-crane level, the only structural difference is workload distribution. This chart is the single strongest argument for prioritizing balance over crane count.</div>
+      <div><canvas id="chartBubble" height="170"></canvas></div>
+    </div>
+
+    <!-- 7. Balance Lever -->
+    <div class="card">
+      <div class="card-t">⑦ The Balance Lever — Quantified</div>
+      <div class="card-i g">At 4 cranes, CV < 40% delivers Net BMPH 102 vs 90. Since pre-planning is constrained by stowage plans, the focus must be execution: monitor CV during operations, and trigger resequencing when crane idle time, breakdowns, or speed gaps push CV above 40%. Target: CV ≤ 40% for ≥ 80% of working time.</div>
+      <div><canvas id="chartLever" height="170"></canvas></div>
+    </div>
+  </div>
+
+  <!-- TOP 5 ACTIONS -->
+  <div class="actions-bar">
+    <div class="actions-title">TOP 5 ACTIONS</div>
+    <div class="action-item">
+      <span class="a-num">1</span>
+      <strong>Monitor crane CV during execution in real time</strong>
+      Track workload balance per crane throughout the vessel call. Flag when CV exceeds 40% and trigger resequencing or workload rearrangement. Linked to: Decision 2, Charts ④ ⑦
+    </div>
+    <div class="action-item">
+      <span class="a-num">2</span>
+      <strong>Define rebalancing triggers</strong>
+      Crane idle > 10 min, crane breakdown, or crane pace falling > 30% behind average = mandatory workload resequence. Goal: maintain CV ≤ 40% for ≥ 80% of working time. Linked to: Decision 2, Chart ④
+    </div>
+    <div class="action-item">
+      <span class="a-num">3</span>
+      <strong>Add CV % to post-vessel performance report</strong>
+      Report crane workload CV alongside Net BMPH for every vessel call. Track weekly and monthly trend vs 40% target. Linked to: Decision 2, Chart ⑦
+    </div>
+    <div class="action-item">
+      <span class="a-num">4</span>
+      <strong>Engage shipping lines on CI-to-capacity alignment</strong>
+      For services with recurring CI ≥ 5 vessels capped at 4 cranes, discuss berth window adjustments, vessel rotation changes, or service swaps that better match CI to available crane resources. Linked to: Decision 3, Chart ①
+    </div>
+    <div class="action-item">
+      <span class="a-num">5</span>
+      <strong>Adopt COSCO as the internal benchmark</strong>
+      Use COSCO's CV 10% and Net BMPH 119 as the reference point in monthly reviews. Set MSC improvement milestones: first target CV < 40% for 80% of calls. Linked to: Decision 1, Chart ⑤
+    </div>
+  </div>
+</div>
+
+<script>
+const C={blue:'#3B82F6',orange:'#F59E0B',red:'#EF4444',green:'#10B981',cyan:'#06B6D4',purple:'#8B5CF6',teal:'#14B8A6',grid:'rgba(88,102,140,0.13)',tick:'#5A6580'};
+const dS={x:{grid:{color:C.grid},ticks:{color:C.tick,font:{family:'JetBrains Mono',size:9.5}}},y:{grid:{color:C.grid},ticks:{color:C.tick,font:{family:'JetBrains Mono',size:9.5}}}};
+Chart.defaults.font.family='DM Sans';Chart.defaults.color='#8892A8';
+
+// MSC DATA
+const msc=[
+{name:"MSC GAIA",ci:6.10,cr:6,imb:62.4,nb:131.0,sh:0.0},
+{name:"MSC NEW HAVEN",ci:5.57,cr:6,imb:48.7,nb:167.9,sh:17.2},
+{name:"MSC JUBILEE IX",ci:5.56,cr:4,imb:71.4,nb:89.6,sh:17.2},
+{name:"MSC INDEPENDENT III",ci:3.48,cr:4,imb:20.3,nb:109.0,sh:0.0},
+{name:"MSC RANIA VIII",ci:5.53,cr:5,imb:70.9,nb:100.3,sh:11.5},
+{name:"PUSAN C",ci:5.61,cr:3,imb:29.9,nb:77.8,sh:11.5},
+{name:"MSC MAKALU III",ci:3.52,cr:4,imb:50.2,nb:89.7,sh:0.0},
+{name:"MSC RACHELE",ci:5.57,cr:3,imb:23.5,nb:62.4,sh:0.0},
+{name:"MSC TIGER III",ci:3.46,cr:3,imb:32.5,nb:75.6,sh:0.0},
+{name:"MSC ELBA",ci:3.85,cr:4,imb:68.1,nb:99.7,sh:20.3},
+{name:"MSC MANU",ci:4.34,cr:3,imb:48.7,nb:68.4,sh:20.3},
+{name:"MSC TRIESTE",ci:6.10,cr:6,imb:81.4,nb:116.9,sh:16.6},
+{name:"MSC ANCHORAGE",ci:4.99,cr:2,imb:30.4,nb:55.0,sh:16.6},
+{name:"XIN BIN ZHOU",ci:3.51,cr:4,imb:39.0,nb:88.6,sh:3.2},
+{name:"C HAMBURG",ci:5.57,cr:5,imb:94.9,nb:99.2,sh:3.2},
+{name:"MSC LISBON IX",ci:5.61,cr:4,imb:58.0,nb:86.2,sh:0.0},
+{name:"MSC TIGER III",ci:3.46,cr:4,imb:59.4,nb:86.7,sh:0.0},
+{name:"CONTI MAKALU",ci:5.57,cr:4,imb:25.0,nb:110.1,sh:0.0},
+{name:"MSC MUNDRA VIII",ci:5.54,cr:5,imb:36.7,nb:118.8,sh:5.2},
+{name:"MSC MAKALU III",ci:3.52,cr:4,imb:12.4,nb:106.3,sh:5.2},
+{name:"MSC MARIA SAVERIA",ci:6.10,cr:4,imb:22.5,nb:93.4,sh:0.0},
+{name:"MSC ARCHIMIDIS",ci:5.30,cr:4,imb:37.1,nb:99.7,sh:0.0},
+{name:"MSC BRIDGEPORT",ci:5.38,cr:4,imb:88.6,nb:84.0,sh:10.0},
+{name:"MSC VAIGA III",ci:3.70,cr:4,imb:53.7,nb:96.9,sh:10.0},
+{name:"MSC MANU",ci:4.34,cr:4,imb:20.5,nb:109.2,sh:0.0},
+{name:"MSC NEW JERSEY",ci:3.54,cr:3,imb:3.7,nb:94.8,sh:0.0},
+{name:"XIN BIN ZHOU",ci:3.51,cr:4,imb:65.5,nb:86.2,sh:0.0},
+{name:"MSC ALTAIR",ci:6.11,cr:3,imb:112.9,nb:52.5,sh:0.0},
+{name:"MSC ALTAIR",ci:6.11,cr:4,imb:89.9,nb:81.8,sh:0.0},
+{name:"MSC TIGER III",ci:3.46,cr:3,imb:5.1,nb:83.7,sh:14.9},
+{name:"MSC ELBA",ci:3.85,cr:3,imb:19.2,nb:89.4,sh:14.9},
+{name:"GSL NINGBO",ci:5.38,cr:4,imb:54.5,nb:92.9,sh:0.0},
+{name:"MSC MAPUTO",ci:4.53,cr:4,imb:54.0,nb:85.0,sh:0.0},
+{name:"MSC MAKALU III",ci:3.52,cr:4,imb:58.1,nb:96.9,sh:0.0},
+{name:"MSC EMANUELA",ci:6.10,cr:3,imb:11.9,nb:78.0,sh:0.0},
+{name:"MSC CHIARA",ci:5.78,cr:4,imb:33.8,nb:100.8,sh:0.0},
+{name:"MSC AMEERA III",ci:3.85,cr:4,imb:40.4,nb:105.3,sh:0.0},
+{name:"MSC SENEGAL",ci:4.33,cr:4,imb:14.9,nb:104.2,sh:0.0},
+{name:"MSC COLETTE III",ci:3.52,cr:4,imb:24.1,nb:106.2,sh:0.0},
+{name:"BREMEN",ci:5.57,cr:4,imb:19.2,nb:101.8,sh:0.0},
+{name:"MSC AGAMEMNON VIII",ci:5.30,cr:4,imb:67.9,nb:84.8,sh:9.2},
+{name:"MSC SPARKLE III",ci:3.33,cr:3,imb:15.1,nb:65.5,sh:9.2},
+{name:"XIN BIN ZHOU",ci:3.51,cr:4,imb:38.2,nb:97.9,sh:7.7},
+{name:"MSC DAKAR X",ci:5.00,cr:4,imb:57.9,nb:80.8,sh:7.7},
+];
+
+// COSCO DATA
+const cosco=[
+{name:"ERASMUS JUSTICE",ci:3.69,cr:4,imb:2.5,nb:118.6,sh:0.0},
+{name:"YANTIAN I",ci:5.84,cr:4,imb:15.8,nb:117.9,sh:4.1},
+{name:"SHANGHAI",ci:5.84,cr:4,imb:8.2,nb:131.1,sh:0.0},
+{name:"XIN OU ZHOU",ci:5.58,cr:5,imb:29.6,nb:106.9,sh:7.5},
+{name:"XIN HONG KONG",ci:5.61,cr:4,imb:3.8,nb:130.6,sh:0.0},
+{name:"COSCO SHIPPING THAMES",ci:5.00,cr:3,imb:8.8,nb:90.2,sh:0.0},
+{name:"COSCO MALAYSIA",ci:5.57,cr:4,imb:7.0,nb:127.2,sh:0.0},
+{name:"BEIJING",ci:5.84,cr:4,imb:7.8,nb:115.4,sh:0.0},
+{name:"COSCO ASIA",ci:5.82,cr:4,imb:6.1,nb:114.7,sh:0.0},
+{name:"COSCO AMERICA",ci:5.82,cr:4,imb:11.8,nb:123.3,sh:0.0},
+{name:"COSCO SHIPPING VOLGA",ci:5.00,cr:4,imb:8.9,nb:134.2,sh:0.0},
+];
+
+// ========== CHART 1: CI vs Actual Cranes — CV & Simul overlay ==========
+const refLine=[{x:2,y:2},{x:3,y:3},{x:4,y:4},{x:5,y:5},{x:6,y:6},{x:7,y:7}];
+// Split MSC into CV bands × Simultaneity
+const cvBands = [
+  {label:'CV<25% Single',filter:v=>v.imb<25&&v.sh===0,color:'#10B981',style:'circle'},
+  {label:'CV<25% Simul',filter:v=>v.imb<25&&v.sh>0,color:'#10B981',style:'triangle'},
+  {label:'CV 25–60% Single',filter:v=>v.imb>=25&&v.imb<60&&v.sh===0,color:'#F59E0B',style:'circle'},
+  {label:'CV 25–60% Simul',filter:v=>v.imb>=25&&v.imb<60&&v.sh>0,color:'#F59E0B',style:'triangle'},
+  {label:'CV≥60% Single',filter:v=>v.imb>=60&&v.sh===0,color:'#EF4444',style:'circle'},
+  {label:'CV≥60% Simul',filter:v=>v.imb>=60&&v.sh>0,color:'#EF4444',style:'triangle'},
+];
+const ch1Datasets = [
+  {label:'100% CI',data:refLine,type:'line',borderColor:'rgba(255,255,255,0.14)',borderDash:[5,4],borderWidth:1.5,pointRadius:0,fill:false,order:10},
+];
+cvBands.forEach(b=>{
+  const pts=msc.filter(b.filter).map(v=>({x:v.ci,y:v.cr,n:v.name,cv:v.imb,nb:v.nb}));
+  if(pts.length>0) ch1Datasets.push({label:b.label,data:pts,backgroundColor:b.color,borderColor:b.color,pointRadius:5.5,pointStyle:b.style,pointHoverRadius:7,order:1});
+});
+
+new Chart(document.getElementById('chartCI'),{type:'scatter',data:{datasets:ch1Datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',align:'end',labels:{boxWidth:6,usePointStyle:true,font:{size:8},padding:6,filter:i=>i.text!=='100% CI'}},tooltip:{callbacks:{label:ctx=>{const d=ctx.raw;if(!d.n)return null;return `${d.n} | CI:${d.x}→${d.y}cr | CV:${d.cv}% | Net BMPH:${d.nb}`}}}},scales:{x:{...dS.x,title:{display:true,text:'CI (LOA ÷ 60)',color:C.tick,font:{size:9.5,weight:'600'}},min:2.5,max:7},y:{...dS.y,title:{display:true,text:'Actual Cranes',color:C.tick,font:{size:9.5,weight:'600'}},min:1,max:7,ticks:{...dS.y.ticks,stepSize:1}}}}});
+
+// ========== CHART 2: Crane Distribution — MSC vs COSCO ==========
+const mscNb=[55.0,74.8,95.3,106.1,138.6];
+const coscoNb=[0,90.2,123.7,106.9,0];
+new Chart(document.getElementById('chartDist'),{type:'bar',data:{labels:['2 cranes','3 cranes','4 cranes','5 cranes','6 cranes'],datasets:[
+  {label:'MSC',data:[1,10,27,3,3],backgroundColor:C.blue+'CC',borderRadius:4,borderSkipped:false,barPercentage:.75,categoryPercentage:.65},
+  {label:'COSCO',data:[0,1,9,1,0],backgroundColor:C.teal+'CC',borderRadius:4,borderSkipped:false,barPercentage:.75,categoryPercentage:.65},
+]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{position:'top',align:'end',labels:{boxWidth:7,usePointStyle:true,font:{size:9.5}}},tooltip:{callbacks:{afterLabel:ctx=>{const nb=ctx.datasetIndex===0?mscNb:coscoNb;const v=nb[ctx.dataIndex];return v>0?`Avg Net BMPH: ${v}`:'No calls'}}}},scales:{x:{...dS.x,title:{display:true,text:'Vessel Calls',color:C.tick,font:{size:9.5,weight:'600'}}},y:{...dS.y,grid:{display:false}}},animation:{onComplete:function(){const c=this,x=c.ctx;x.font='600 9px JetBrains Mono';x.textAlign='left';x.textBaseline='middle';c.data.datasets.forEach((ds,di)=>{x.fillStyle=di===0?'#93B4F8':C.teal;c.getDatasetMeta(di).data.forEach((bar,i)=>{const v=ds.data[i];if(v>0)x.fillText(`${v}`,bar.x+4,bar.y)})})}}}});
+
+// ========== CHART 3: Simultaneity Hours vs Net BMPH ==========
+new Chart(document.getElementById('chartSimul'),{type:'scatter',data:{datasets:[
+  {label:'Net BMPH ≥ 100',data:msc.filter(v=>v.nb>=100).map(v=>({x:v.sh,y:v.nb})),backgroundColor:C.green,pointRadius:5},
+  {label:'Net BMPH < 100',data:msc.filter(v=>v.nb<100).map(v=>({x:v.sh,y:v.nb})),backgroundColor:C.red+'CC',pointRadius:5},
+  // Target line
+  {label:'Target 100',data:[{x:0,y:100},{x:22,y:100}],type:'line',borderColor:'rgba(255,255,255,0.2)',borderDash:[4,3],borderWidth:1.5,pointRadius:0,fill:false}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',align:'end',labels:{boxWidth:7,usePointStyle:true,font:{size:9},filter:i=>i.text!=='Target 100'}},tooltip:{callbacks:{label:ctx=>{const d=ctx.raw;if(!ctx.dataset.label.includes('BMPH'))return null;return `Simul: ${d.x}h | Net BMPH: ${d.y}`}}}},scales:{x:{...dS.x,title:{display:true,text:'Simultaneity Hours',color:C.tick,font:{size:9.5,weight:'600'}},min:0,max:22},y:{...dS.y,title:{display:true,text:'Net BMPH',color:C.tick,font:{size:9.5,weight:'600'}}}}}});
+
+// ========== CHART 4: Imbalance Bar ==========
+const top15=[...msc].sort((a,b)=>b.imb-a.imb).slice(0,15);
+new Chart(document.getElementById('chartImb'),{type:'bar',data:{labels:top15.map(v=>v.name.length>18?v.name.substring(0,16)+'…':v.name),datasets:[{data:top15.map(v=>v.imb),backgroundColor:top15.map(v=>v.imb>70?C.red:v.imb>45?C.orange:C.green),borderRadius:3,borderSkipped:false,barPercentage:.6}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{afterLabel:ctx=>{const v=top15[ctx.dataIndex];return `Cranes: ${v.cr} | Net BMPH: ${v.nb} | Simul: ${v.sh}h`}}}},scales:{x:{...dS.x,title:{display:true,text:'Imbalance CV %',color:C.tick,font:{size:9.5,weight:'600'}},max:130},y:{...dS.y,grid:{display:false},ticks:{...dS.y.ticks,font:{family:'DM Sans',size:8.5}}}},animation:{onComplete:function(){const c=this,x=c.ctx;x.font='500 9px JetBrains Mono';x.textAlign='left';x.textBaseline='middle';top15.forEach((v,i)=>{const m=c.getDatasetMeta(0).data[i];x.fillStyle=v.imb>70?C.red:'#8892A8';x.fillText(`${v.imb}%`,m.x+4,m.y)})}}}});
+
+// ========== CHART 6: Bubble — MSC + COSCO ==========
+const crSize={2:4,3:5,4:7,5:9,6:12};
+const mscBub=msc.map(v=>({x:v.imb,y:v.nb,r:crSize[v.cr]||6,name:v.name,cr:v.cr}));
+const coscoBub=cosco.map(v=>({x:v.imb,y:v.nb,r:crSize[v.cr]||6,name:v.name,cr:v.cr}));
+
+new Chart(document.getElementById('chartBubble'),{type:'bubble',data:{datasets:[
+  {label:'MSC',data:mscBub,backgroundColor:C.blue+'88',borderColor:C.blue,borderWidth:1.2},
+  {label:'COSCO',data:coscoBub,backgroundColor:C.teal+'AA',borderColor:C.teal,borderWidth:1.5},
+  {label:'Target 100',data:[{x:0,y:100,r:0},{x:120,y:100,r:0}],type:'line',borderColor:'rgba(255,255,255,0.18)',borderDash:[4,3],borderWidth:1.5,pointRadius:0,fill:false}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',align:'end',labels:{boxWidth:7,usePointStyle:true,font:{size:9.5},filter:i=>i.text!=='Target 100'}},tooltip:{callbacks:{label:ctx=>{const d=ctx.raw;if(!d.name)return null;return `${d.name} | ${ctx.dataset.label} | ${d.cr}cr | CV:${d.x}% | Net BMPH:${d.y}`}}}},scales:{x:{...dS.x,title:{display:true,text:'Imbalance CV %',color:C.tick,font:{size:9.5,weight:'600'}},min:0},y:{...dS.y,title:{display:true,text:'Net BMPH',color:C.tick,font:{size:9.5,weight:'600'}}}}}});
+
+// ========== CHART 7: Balance Lever — Grouped Bar ==========
+const leverData={labels:['3 cranes','4 cranes','5 cranes'],low:[78.4,102.3,118.8],high:[60.4,89.8,99.8],nLow:[8,12,1],nHigh:[2,15,2]};
+new Chart(document.getElementById('chartLever'),{type:'bar',data:{labels:leverData.labels,datasets:[
+  {label:'CV < 40%',data:leverData.low,backgroundColor:C.green+'CC',borderRadius:4,borderSkipped:false,barPercentage:.7,categoryPercentage:.6},
+  {label:'CV ≥ 40%',data:leverData.high,backgroundColor:C.red+'99',borderRadius:4,borderSkipped:false,barPercentage:.7,categoryPercentage:.6},
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',align:'end',labels:{boxWidth:7,usePointStyle:true,font:{size:9.5}}},tooltip:{callbacks:{afterLabel:(ctx)=>{const ns=ctx.datasetIndex===0?leverData.nLow:leverData.nHigh;return `n = ${ns[ctx.dataIndex]} vessels`}}}},scales:{x:{...dS.x,grid:{display:false}},y:{...dS.y,title:{display:true,text:'Avg Net BMPH',color:C.tick,font:{size:9.5,weight:'600'}},min:40}},animation:{onComplete:function(){const c=this,x=c.ctx;x.font='600 10px JetBrains Mono';x.textAlign='center';x.textBaseline='bottom';c.data.datasets.forEach((ds,di)=>{c.getDatasetMeta(di).data.forEach((bar,i)=>{x.fillStyle=di===0?C.green:'#E8ECF4';x.fillText(ds.data[i].toFixed(1),bar.x,bar.y-3)})})}}}});
+</script>
+</body>
+</html>
